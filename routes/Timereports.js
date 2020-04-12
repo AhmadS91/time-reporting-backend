@@ -1,19 +1,20 @@
 const { TimeReport, validate } = require("../models/Timereport");
+const { Activity } = require("../models/Activity");
 const express = require("express");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const timereports = await TimeReport.find();
-  return res.send(timereports);
+  const timeReports = await TimeReport.find();
+  return res.send(timeReports);
 });
 
-router.get("/:id", async (req, res) => {
-  const timereport = await Timereports.findById(req.params.id);
+router.get("/:date", async (req, res) => {
+  const timeReport = await TimeReport.findOne({ date: req.params.date });
 
-  if (!timereport)
-    return res.status(404).send("The timereport with given Id was'nt found");
+  if (!timeReport)
+    return res.status(404).send("The timereport with given date was'nt found");
 
-  return res.send(timereport);
+  return res.send(timeReport);
 });
 
 router.post("/", async (req, res) => {
@@ -21,16 +22,19 @@ router.post("/", async (req, res) => {
 
   if (error) return res.status(400).send(error.details[0].message);
 
-  const timereport = new Genre({
+  const activity = await Activity.findById(req.body.activityId);
+  if (!activity) return res.status(400).send("Invalid activity.");
+  const timeReport = new TimeReport({
+    date: req.body.date,
     startHours: req.body.startHours,
     endHour: req.body.endHour,
     startMinutes: req.body.startMinutes,
     endMinutes: req.body.endMinutes,
-    activity: req.body.activity
+    activity: { _id: activity._id, name: activity.name },
   });
 
-  await timereport.save();
-  res.send(timereport);
+  await timeReport.save();
+  res.send(timeReport);
 });
 
 router.put("/:id", async (req, res) => {
@@ -38,28 +42,29 @@ router.put("/:id", async (req, res) => {
 
   if (error) return res.status(400).send(error.details[0].message);
 
-  const timereport = await Timereports.findByIdAndUpdate(
+  const timeReport = await TimeReport.findByIdAndUpdate(
     req.params.id,
     {
+      date: req.body.date,
       startHours: req.body.startHours,
       endHour: req.body.endHour,
       startMinutes: req.body.startMinutes,
       endMinutes: req.body.endMinutes,
-      activity: req.body.activity
+      activity: req.body.activity,
     },
     { new: true }
   );
 
-  if (!timereport)
+  if (!timeReport)
     return res.status(404).send("The timereport with given Id was'nt found");
 
-  res.send(timereport);
+  res.send(timeReport);
 });
 
-router.delete("/:id", (req, res) => {
-  const timereport = timereport.findByIdAndRemove(req.params.id);
+router.delete("/:id", async (req, res) => {
+  const timeReport = await TimeReport.findByIdAndDelete(req.params.id);
 
-  if (!timereport)
+  if (!timeReport._id)
     return res.status(404).send("The timereport with given Id was'nt found");
 
   res.send(timeReport);

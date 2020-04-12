@@ -1,68 +1,57 @@
 const Joi = require("@hapi/joi");
 const mongoose = require("mongoose");
+const { activitySchema } = require("./Activity");
 
 const TimeReport = mongoose.model(
-  "Timereport",
+  "TimeReport",
   new mongoose.Schema({
     date: {
-      type: Date,
-      required: true
+      type: String,
+      required: true,
+    },
+    activity: {
+      type: activitySchema,
+      required: true,
     },
     startHours: {
       type: Number,
       min: 0,
       max: 24,
-      required: true
+      required: true,
     },
     endHour: {
       type: Number,
       min: 0,
       maxlength: 24,
-      required: true
+      required: true,
     },
     startMinutes: {
       type: Number,
       min: 1,
       max: 59,
-      required: true
+      required: true,
     },
     endMinutes: {
       type: Number,
       min: 1,
       maxlength: 59,
-      required: true
+      required: true,
     },
-    activity: {
-      type: String,
-      required: true
-    }
   })
 );
 
-function validateTimereport(timereport) {
+function validateTimeReport(timeReport) {
   const schema = Joi.object({
-    date: Joi.date().required(true),
-    startHours: Joi.number()
-      .min(0)
-      .max(24)
-      .required(),
-    endHour: Joi.number()
-      .min(0)
-      .max(24)
-      .required(),
-    startMinutes: Joi.number()
-      .min(1)
-      .max(59)
-      .required(),
-    endMinutes: Joi.number()
-      .min(1)
-      .max(59)
-      .required(),
-    activity: Joi.string().required(true)
+    date: Joi.string().required(),
+    activityId: Joi.string().required(),
+    startHours: Joi.number().min(0).max(24).required(),
+    endHour: Joi.number().min(0).max(24).required(),
+    startMinutes: Joi.number().min(1).max(59).required(),
+    endMinutes: Joi.number().min(1).max(59).required(),
   });
 
-  return schema.validate(timereport);
+  return schema.validate(timeReport);
 }
 
 exports.TimeReport = TimeReport;
-exports.validate = validateTimereport;
+exports.validate = validateTimeReport;
