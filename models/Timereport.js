@@ -27,13 +27,13 @@ const TimeReport = mongoose.model(
     },
     startMinutes: {
       type: Number,
-      min: 1,
+      min: 0,
       max: 59,
       required: true,
     },
     endMinutes: {
       type: Number,
-      min: 1,
+      min: 0,
       maxlength: 59,
       required: true,
     },
@@ -46,8 +46,8 @@ function validateTimeReport(timeReport) {
     activityId: Joi.string().required(),
     startHours: Joi.number().min(0).max(24).required(),
     endHour: Joi.number().min(0).max(24).required(),
-    startMinutes: Joi.number().min(1).max(59).required(),
-    endMinutes: Joi.number().min(1).max(59).required(),
+    startMinutes: Joi.number().min(0).max(59).required(),
+    endMinutes: Joi.number().min(0).max(59).required(),
   });
 
   return schema.validate(timeReport);
